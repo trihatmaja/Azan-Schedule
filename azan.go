@@ -77,7 +77,7 @@ func init() {
 			return nil
 		})
 
-	goopt.Author = "Wicaksono Trihatmaja <wicaksono.trihatmaja@navcore.com>"
+	goopt.Author = "Wicaksono Trihatmaja <trihatmaja@gmail.com>"
 
 	goopt.Version = "1.0"
 
