@@ -8,4 +8,5 @@ This application to generate Azan Schedule or Sholat Schedule based on position(
 
 ### Next
 1. Insert the azan file azan.ogg
-2. Generate cron job based on the time generated to execute azan file.
+2. file.txt will generated automatically
+3. Generate cron job file based on the time generated to execute azan file. But the user should install the cron job file by himself
