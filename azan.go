@@ -20,6 +20,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"strconv"
 	"strings"
@@ -40,6 +41,8 @@ var mymonth = [12]string{"January", "February", "March", "April", "May", "June",
 
 const PI float64 = 3.14159
 const rad float64 = PI / 180.0
+
+var strbuf string
 
 func init() {
 	goopt.ReqArg([]string{"--latitude"}, "LAT", "Latitude Value",
@@ -91,6 +94,13 @@ func init() {
 }
 
 func calculation() {
+	strbuf += fmt.Sprintln("Jadwal Waktu Azan untuk wilayah", city)
+	if timezone > 0 {
+		strbuf += fmt.Sprintf("GMT+%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
+	} else {
+		strbuf += fmt.Sprintf("GMT-%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
+	}
+
 	lamd := longitude / 15.0
 	phi := latitiude * rad
 	tdif := timezone - lamd
@@ -99,7 +109,7 @@ func calculation() {
 	zd := 0.0
 	n := 0.0
 	for i := 0; i < 12; i++ {
-		fmt.Println("\n" + mymonth[i] + "\nTgl\tSubuh\tTerbit\tZuhur\tAshar\tMagrib\tIsya")
+		strbuf += fmt.Sprintln("\n" + mymonth[i] + "\nTgl\tSubuh\tTerbit\tZuhur\tAshar\tMagrib\tIsya")
 		for k := 0; k < mydate[i]; k++ {
 			n = n + 1.0
 			a := 6.0
@@ -171,17 +181,17 @@ func calculation() {
 					}
 				}
 			}
-			fmt.Printf("%d\t", k+1)
+			strbuf += fmt.Sprintf("%d\t", k+1)
 			for j := 1; j < 7; j++ {
 				th := int32(t[j])
 				tm := int32((t[j] - float64(th)) * 60.0)
 				if tm < 10 {
-					fmt.Printf("%d:0%d\t", th, tm)
+					strbuf += fmt.Sprintf("%d:0%d\t", th, tm)
 				} else {
-					fmt.Printf("%d:%d\t", th, tm)
+					strbuf += fmt.Sprintf("%d:%d\t", th, tm)
 				}
 				if j == 6 {
-					fmt.Printf("\n")
+					strbuf += fmt.Sprintf("\n")
 				}
 			}
 			if int(n) == 59 {
@@ -191,16 +201,13 @@ func calculation() {
 			}
 		}
 	}
-
+	err := ioutil.WriteFile(city+".txt", []byte(strbuf), 0644)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
 	goopt.Parse(nil)
-	fmt.Println("Jadwal Waktu Azan untuk wilayah", city)
-	if timezone > 0 {
-		fmt.Printf("GMT+%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
-	} else {
-		fmt.Printf("GMT-%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
-	}
 	calculation()
 }
