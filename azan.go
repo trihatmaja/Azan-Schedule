@@ -88,7 +88,6 @@ func init() {
 	goopt.Description = func() string {
 		return "Azan Schedule"
 	}
-
 }
 
 func calculation() {
@@ -140,28 +139,29 @@ func calculation() {
 				st = h + RA - 0.06571*st - 6.622 + 24.0
 				st = st - float64(int(st/24.0)*24.0)
 				st = st + tdif
-				if w == 1 {
+				switch w {
+				case 1:
 					if math.Abs(X) <= 1.0 {
 						t[1] = st // t[1] = subuh
 					}
 					z = (90.0 + 5.0/6.0) * rad
-				} else if w == 2 {
+				case 2:
 					t[2] = st // t[2] = sunrise
 					a = 18.0
 					z = (90.0 + 5.0/6.0) * rad
-				} else if w == 3 {
+				case 3:
 					t[5] = st + 2.0/60.0 // t[5] = maghrib
 					z = 108.0 * rad
-				} else if w == 4 {
+				case 4:
 					if math.Abs(X) <= 1.0 {
 						t[6] = st // t[6] = isya
 					}
 					a = 12.0
-				} else if w == 5 {
+				case 5:
 					t[3] = st + 2.0/60.0 // t[3] = dhuhur
 					zd = math.Abs((dek - phi))
 					a = 15.0
-				} else {
+				case 6:
 					t[4] = st // t[4] = ashar
 				}
 
