@@ -98,7 +98,7 @@ func calculation() {
 	if timezone > 0 {
 		strbuf += fmt.Sprintf("GMT+%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
 	} else {
-		strbuf += fmt.Sprintf("GMT-%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
+		strbuf += fmt.Sprintf("GMT%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
 	}
 
 	lamd := longitude / 15.0
