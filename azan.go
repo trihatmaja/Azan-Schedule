@@ -1,5 +1,22 @@
 package main
 
+/*
+# azan.go
+# Anda boleh menggunakan dan menyebarkan file ini dengan menyebutkan sumbernya:
+# Nara Sumber awal:
+# Dr. T. Djamaluddin
+# Lembaga Penerbangan dan Antariksa Nasional (LAPAN) Bandung
+# Phone 022-6012602. Fax 022-6014998
+# e-mail: t_djamal@lapan.go.id  t_djamal@hotmail.com
+# Porting ke Perl:
+# Wastono ST
+# Jl Taman Cilandak Rt:001 Rw:04 No.4 Jakarta 12430
+# Phone 021-75909268. was.tono@gmail.com
+# Porting ke Golang:
+# Wicaksono Trihatmaja
+# trihatmaja@gmail.com
+*/
+
 import (
 	"errors"
 	"fmt"
