@@ -2,17 +2,17 @@ package main
 
 /*
 # azan.go
-# Anda boleh menggunakan dan menyebarkan file ini dengan menyebutkan sumbernya:
-# Nara Sumber awal:
+# You may distribute this file without removing the respective contributor:
+# Early source:
 # Dr. T. Djamaluddin
 # Lembaga Penerbangan dan Antariksa Nasional (LAPAN) Bandung
 # Phone 022-6012602. Fax 022-6014998
 # e-mail: t_djamal@lapan.go.id  t_djamal@hotmail.com
-# Porting ke Perl:
+# Port to Perl:
 # Wastono ST
 # Jl Taman Cilandak Rt:001 Rw:04 No.4 Jakarta 12430
 # Phone 021-75909268. was.tono@gmail.com
-# Porting ke Golang:
+# Port to Golang:
 # Wicaksono Trihatmaja
 # trihatmaja@gmail.com
 */
@@ -94,7 +94,7 @@ func init() {
 }
 
 func calculation() {
-	strbuf += fmt.Sprintln("Jadwal Waktu Azan untuk wilayah", city)
+	strbuf += fmt.Sprintln("Schedule azan of ", city)
 	if timezone > 0 {
 		strbuf += fmt.Sprintf("GMT+%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
 	} else {
@@ -109,7 +109,7 @@ func calculation() {
 	zd := 0.0
 	n := 0.0
 	for i := 0; i < 12; i++ {
-		strbuf += fmt.Sprintln("\n" + mymonth[i] + "\nTgl\tSubuh\tTerbit\tZuhur\tAshar\tMagrib\tIsya")
+		strbuf += fmt.Sprintln("\n" + mymonth[i] + "\nDate\tFajr\tSunrise\tZuhr\tAsr\tMagrib\tIsya'")
 		for k := 0; k < mydate[i]; k++ {
 			n = n + 1.0
 			a := 6.0
@@ -152,7 +152,7 @@ func calculation() {
 				switch w {
 				case 1:
 					if math.Abs(X) <= 1.0 {
-						t[1] = st // t[1] = subuh
+						t[1] = st // t[1] = fajr
 					}
 					z = (90.0 + 5.0/6.0) * rad
 				case 2:
@@ -164,15 +164,15 @@ func calculation() {
 					z = 108.0 * rad
 				case 4:
 					if math.Abs(X) <= 1.0 {
-						t[6] = st // t[6] = isya
+						t[6] = st // t[6] = isya'
 					}
 					a = 12.0
 				case 5:
-					t[3] = st + 2.0/60.0 // t[3] = dhuhur
+					t[3] = st + 2.0/60.0 // t[3] = zuhr
 					zd = math.Abs((dek - phi))
 					a = 15.0
 				case 6:
-					t[4] = st // t[4] = ashar
+					t[4] = st // t[4] = asr
 				}
 
 				if n == 59.0 {
