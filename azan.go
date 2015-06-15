@@ -24,6 +24,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	//"time"
 )
 
 import (
@@ -109,7 +110,8 @@ func calculation() {
 	zd := 0.0
 	n := 0.0
 	for i := 0; i < 12; i++ {
-		strbuf += fmt.Sprintln("\n" + mymonth[i] + "\nDate\tFajr\tSunrise\tZuhr\tAsr\tMagrib\tIsya'")
+		strbuf += fmt.Sprintln("\n" + mymonth[i] + "\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
+		//strbuf += fmt.Sprintln("\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
 		for k := 0; k < mydate[i]; k++ {
 			n = n + 1.0
 			a := 6.0
@@ -177,11 +179,12 @@ func calculation() {
 
 				if n == 59.0 {
 					if k == 27 {
-						n = n - 1.0
+						n--
 					}
 				}
 			}
-			strbuf += fmt.Sprintf("%d\t", k+1)
+
+			strbuf += fmt.Sprintf("%d\t\t", k+1)
 			for j := 1; j < 7; j++ {
 				th := int32(t[j])
 				tm := int32((t[j] - float64(th)) * 60.0)
