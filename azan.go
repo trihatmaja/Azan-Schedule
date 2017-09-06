@@ -1,4 +1,4 @@
-package main
+package azan
 
 /*
 # azan.go
@@ -10,121 +10,77 @@ package main
 # e-mail: t_djamal@lapan.go.id  t_djamal@hotmail.com
 # Port to Perl:
 # Wastono ST
-# Jl Taman Cilandak Rt:001 Rw:04 No.4 Jakarta 12430
-# Phone 021-75909268. was.tono@gmail.com
+# was.tono@gmail.com
 # Port to Golang:
 # Wicaksono Trihatmaja
 # trihatmaja@gmail.com
 */
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
-	"strconv"
-	"strings"
-	//"time"
 )
 
-import (
-	"github.com/droundy/goopt"
+const (
+	Pi  = 3.14159
+	Rad = Pi / 180.0
 )
 
-var latitiude float64
-var longitude float64
-var timezone float64
-var city string
-var t [7]float64
+var (
+	TheDate  = []int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+	TheMonth = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+)
 
-var mydate = [12]int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-var mymonth = [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+type Azan struct {
+	Latitude  float64
+	Longitude float64
+	Timezone  float64
+	City      string
+	T         [7]float64
+	StrBuff   string
+}
 
-const PI float64 = 3.14159
-const rad float64 = PI / 180.0
-
-var strbuf string
-
-func init() {
-	goopt.ReqArg([]string{"--latitude"}, "LAT", "Latitude Value",
-		func(to string) error {
-			var err error
-			latitiude, err = strconv.ParseFloat(to, 64)
-			if err != nil {
-				return errors.New("value not an float")
-			}
-			return nil
-		})
-	goopt.ReqArg([]string{"--longitude"}, "LONG", "Longitude Value",
-		func(to string) error {
-			var err error
-			longitude, err = strconv.ParseFloat(to, 64)
-			if err != nil {
-				return errors.New("value not an float")
-			}
-			return nil
-		})
-
-	goopt.ReqArg([]string{"--timezone"}, "TZ", "Time Zone Value",
-		func(to string) error {
-			var err error
-			timezone, err = strconv.ParseFloat(to, 64)
-			if err != nil {
-				return errors.New("value not an float")
-			}
-			return nil
-		})
-
-	goopt.ReqArg([]string{"--city"}, "CT", "City",
-		func(to string) error {
-			city = strings.ToUpper(to)
-			return nil
-		})
-
-	goopt.Author = "Wicaksono Trihatmaja <trihatmaja@gmail.com>"
-
-	goopt.Version = "1.0"
-
-	goopt.Suite = "Azan Schedule"
-
-	goopt.Summary = "Azan Schedule based on location latitude and longitude"
-
-	goopt.Description = func() string {
-		return "Azan Schedule"
+func New(latitude, longitude, timezone float64, city string) *Azan {
+	return &Azan{
+		Latitude:  latitude,
+		Longitude: longitude,
+		Timezone:  timezone,
+		City:      city,
 	}
 }
 
-func calculation() {
-	strbuf += fmt.Sprintln("Schedule azan of ", city)
-	if timezone > 0 {
-		strbuf += fmt.Sprintf("GMT+%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
+func (az *Azan) Calculation() {
+	az.StrBuff += fmt.Sprintln("Schedule azan of ", az.City)
+	if az.Timezone > 0 {
+		az.StrBuff += fmt.Sprintf("GMT+%v Latitude=%v Longitude=%v\n", az.Timezone, az.Latitude, az.Longitude)
 	} else {
-		strbuf += fmt.Sprintf("GMT%v Latitude=%v Longitude=%v\n", timezone, latitiude, longitude)
+		az.StrBuff += fmt.Sprintf("GMT%v Latitude=%v Longitude=%v\n", az.Timezone, az.Latitude, az.Longitude)
 	}
 
-	lamd := longitude / 15.0
-	phi := latitiude * rad
-	tdif := timezone - lamd
+	lamd := az.Longitude / 15.0
+	phi := az.Latitude * Rad
+	tdif := az.Timezone - lamd
 
 	h := 0.0
 	zd := 0.0
 	n := 0.0
 	for i := 0; i < 12; i++ {
-		strbuf += fmt.Sprintln("\n" + mymonth[i] + "\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
+		az.StrBuff += fmt.Sprintln("\n" + TheMonth[i] + "\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
 		//strbuf += fmt.Sprintln("\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
-		for k := 0; k < mydate[i]; k++ {
+		for k := 0; k < TheDate[i]; k++ {
 			n = n + 1.0
 			a := 6.0
-			z := 110.0 * rad
+			z := 110.0 * Rad
 			for w := 1; w < 7; w++ {
 				st := n + (a-lamd)/24.0
-				L := (0.9856*st - 3.289) * rad
-				L = L + 1.916*rad*math.Sin(L) + 0.02*rad*math.Sin(2*L) + 282.634*rad
-				RA := float64(int(((L/PI)*12.0)/6.0) + 1)
+				L := (0.9856*st - 3.289) * Rad
+				L = L + 1.916*Rad*math.Sin(L) + 0.02*Rad*math.Sin(2*L) + 282.634*Rad
+				RA := float64(int(((L/Pi)*12.0)/6.0) + 1)
 				if int(RA/2)*2-int(RA) != 0 {
 					RA--
 				}
-				RA = (math.Atan(0.91746*math.Tan(L)) / PI * 12.0) + float64(RA*6.0)
+				RA = (math.Atan(0.91746*math.Tan(L)) / Pi * 12.0) + float64(RA*6.0)
 				X := 0.39782 * math.Sin(L)
 				ATNX := math.Sqrt(1 - X*X)
 				dek := math.Atan(X / ATNX)
@@ -133,7 +89,7 @@ func calculation() {
 				}
 				X = (math.Cos(z) - X*math.Sin(phi)) / (ATNX * math.Cos(phi))
 				if X <= 1.0 && X >= -1.0 {
-					ATNX = math.Atan(math.Sqrt(1-X*X)/X) / rad
+					ATNX = math.Atan(math.Sqrt(1-X*X)/X) / Rad
 					if ATNX < 0.0 {
 						ATNX = ATNX + 180.0
 					}
@@ -154,27 +110,27 @@ func calculation() {
 				switch w {
 				case 1:
 					if math.Abs(X) <= 1.0 {
-						t[1] = st // t[1] = fajr
+						az.T[1] = st // t[1] = fajr
 					}
-					z = (90.0 + 5.0/6.0) * rad
+					z = (90.0 + 5.0/6.0) * Rad
 				case 2:
-					t[2] = st // t[2] = sunrise
+					az.T[2] = st // t[2] = sunrise
 					a = 18.0
-					z = (90.0 + 5.0/6.0) * rad
+					z = (90.0 + 5.0/6.0) * Rad
 				case 3:
-					t[5] = st + 2.0/60.0 // t[5] = maghrib
-					z = 108.0 * rad
+					az.T[5] = st + 2.0/60.0 // t[5] = maghrib
+					z = 108.0 * Rad
 				case 4:
 					if math.Abs(X) <= 1.0 {
-						t[6] = st // t[6] = isya'
+						az.T[6] = st // t[6] = isya'
 					}
 					a = 12.0
 				case 5:
-					t[3] = st + 2.0/60.0 // t[3] = zuhr
+					az.T[3] = st + 2.0/60.0 // t[3] = zuhr
 					zd = math.Abs((dek - phi))
 					a = 15.0
 				case 6:
-					t[4] = st // t[4] = asr
+					az.T[4] = st // t[4] = asr
 				}
 
 				if n == 59.0 {
@@ -184,17 +140,17 @@ func calculation() {
 				}
 			}
 
-			strbuf += fmt.Sprintf("%d\t\t", k+1)
+			az.StrBuff += fmt.Sprintf("%d\t\t", k+1)
 			for j := 1; j < 7; j++ {
-				th := int32(t[j])
-				tm := int32((t[j] - float64(th)) * 60.0)
+				th := int32(az.T[j])
+				tm := int32((az.T[j] - float64(th)) * 60.0)
 				if tm < 10 {
-					strbuf += fmt.Sprintf("%d:0%d\t", th, tm)
+					az.StrBuff += fmt.Sprintf("%d:0%d\t", th, tm)
 				} else {
-					strbuf += fmt.Sprintf("%d:%d\t", th, tm)
+					az.StrBuff += fmt.Sprintf("%d:%d\t", th, tm)
 				}
 				if j == 6 {
-					strbuf += fmt.Sprintf("\n")
+					az.StrBuff += fmt.Sprintf("\n")
 				}
 			}
 			if int(n) == 59 {
@@ -204,13 +160,8 @@ func calculation() {
 			}
 		}
 	}
-	err := ioutil.WriteFile(city+".txt", []byte(strbuf), 0644)
+	err := ioutil.WriteFile(az.City+".txt", []byte(az.StrBuff), 0644)
 	if err != nil {
 		panic(err)
 	}
-}
-
-func main() {
-	goopt.Parse(nil)
-	calculation()
 }
