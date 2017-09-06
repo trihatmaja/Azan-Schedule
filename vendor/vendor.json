@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "8YLoOB7KeQqUSPvlBynceGY4xOc=",
+			"path": "github.com/urfave/cli",
+			"revision": "f017f86fccc5a039a98f23311f34fdf78b014f78",
+			"revisionTime": "2017-08-13T14:59:49Z"
+		}
+	],
+	"rootPath": "github.com/trihatmaja/Azan-Schedule"
+}
