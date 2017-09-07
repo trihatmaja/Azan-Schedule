@@ -65,9 +65,12 @@ func (az *Azan) Calculation() {
 	h := 0.0
 	zd := 0.0
 	n := 0.0
+
+	// for each month
 	for i := 0; i < 12; i++ {
-		az.StrBuff += fmt.Sprintln("\n" + TheMonth[i] + "\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
-		//strbuf += fmt.Sprintln("\nDate\tFajr\tSunrise\tZuhr\tAsr\t\tMaghrib\tIsya'")
+		az.StrBuff += fmt.Sprintln("\n" + TheMonth[i] + "\nDate\t\tFajr\t\tSunrise\t\tZuhr\t\tAsr\t\t\tMaghrib\t\tIsya'")
+
+		// for each day
 		for k := 0; k < TheDate[i]; k++ {
 			n = n + 1.0
 			a := 6.0
@@ -140,14 +143,26 @@ func (az *Azan) Calculation() {
 				}
 			}
 
-			az.StrBuff += fmt.Sprintf("%d\t\t", k+1)
+			if k+1 < 10 {
+				az.StrBuff += fmt.Sprintf("0%d\t\t\t", k+1)
+			} else {
+				az.StrBuff += fmt.Sprintf("%d\t\t\t", k+1)
+			}
 			for j := 1; j < 7; j++ {
-				th := int32(az.T[j])
-				tm := int32((az.T[j] - float64(th)) * 60.0)
+				th := int32(az.T[j])                        // hour
+				tm := int32((az.T[j] - float64(th)) * 60.0) // minute
 				if tm < 10 {
-					az.StrBuff += fmt.Sprintf("%d:0%d\t", th, tm)
+					if j == 2 || j == 5 {
+						az.StrBuff += fmt.Sprintf("%d:0%d\t\t\t", th, tm)
+					} else {
+						az.StrBuff += fmt.Sprintf("%d:0%d\t\t", th, tm)
+					}
 				} else {
-					az.StrBuff += fmt.Sprintf("%d:%d\t", th, tm)
+					if j == 2 || j == 5 {
+						az.StrBuff += fmt.Sprintf("%d:%d\t\t\t", th, tm)
+					} else {
+						az.StrBuff += fmt.Sprintf("%d:%d\t\t", th, tm)
+					}
 				}
 				if j == 6 {
 					az.StrBuff += fmt.Sprintf("\n")
