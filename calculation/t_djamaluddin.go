@@ -6,7 +6,6 @@ package calculation
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math"
 )
 

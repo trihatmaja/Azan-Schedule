@@ -2,15 +2,14 @@ package azan
 
 import (
 	"context"
-	"log"
 	"time"
 )
 
 type DbInterface interface {
-	Set(context.Context, DbData) (bool, int64)
-	GetAll(context.Context) []DbData
-	GetByCity(context.Context, string) DbData
-	GetByDate(context.Context, string, time.Time) DbData
+	Set(DbData) (bool, int64)
+	GetAll() []DbData
+	GetByCity(string) DbData
+	GetByDate(string, time.Time) DbData
 }
 
 type DbData struct {
@@ -27,4 +26,20 @@ type DbData struct {
 
 type CalcInterface interface {
 	Calculate()
+}
+
+type Azan struct {
+	db   DbInterface
+	calc CalcInterface
+}
+
+func New(database *DbInterface, calculation *CalcInterface) *Azan {
+	return &Azan{
+		db:   database,
+		calc: calculation,
+	}
+}
+
+func (a *Azan) Generate() {
+	a.calc.Calculate()
 }
