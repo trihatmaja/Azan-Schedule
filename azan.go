@@ -1,39 +1,47 @@
 package azan
 
 import (
-	"context"
+	"log"
 	"time"
 )
 
+// database contract
 type DbInterface interface {
-	Set(DbData) (bool, int64)
-	GetAll() []DbData
-	GetByCity(string) DbData
-	GetByDate(string, time.Time) DbData
+	Set([]CalcResult) error
+	GetAll() ([]CalcResult, error)
+	GetByCity(string) (CalcResult, error)
+	GetByDate(time.Time) (CalcResult, error)
 }
 
-type DbData struct {
-	Kota    string
-	Bulan   string
-	Tanggal time.Time
-	Subuh   time.Time
-	Fajar   time.Time
-	Dhuhur  time.Time
-	Ashar   time.Time
-	Maghrib time.Time
-	Isya    time.Time
-}
-
+// calculation contract
 type CalcInterface interface {
-	Calculate()
+	Calculate() []CalcResult
 }
 
+type CalcResult struct {
+	City     string
+	Month    string
+	Year     int
+	Schedule []AzanSchedule
+}
+
+type AzanSchedule struct {
+	Date    int
+	Fajr    string
+	Sunrise string
+	Zuhr    string
+	Asr     string
+	Maghrib string
+	Isya    string
+}
+
+// azan
 type Azan struct {
 	db   DbInterface
 	calc CalcInterface
 }
 
-func New(database *DbInterface, calculation *CalcInterface) *Azan {
+func New(database DbInterface, calculation CalcInterface) *Azan {
 	return &Azan{
 		db:   database,
 		calc: calculation,
@@ -41,5 +49,11 @@ func New(database *DbInterface, calculation *CalcInterface) *Azan {
 }
 
 func (a *Azan) Generate() {
-	a.calc.Calculate()
+	res := a.calc.Calculate()
+
+	err := a.db.Set(res)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 }

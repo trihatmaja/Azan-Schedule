@@ -7,6 +7,9 @@ package calculation
 import (
 	"fmt"
 	"math"
+	"time"
+
+	azan "github.com/trihatmaja/Azan-Schedule"
 )
 
 const (
@@ -19,7 +22,7 @@ var (
 	TheMonth = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 )
 
-type Calculation struct {
+type TDjamaluddin struct {
 	Latitude  float64
 	Longitude float64
 	Timezone  float64
@@ -27,23 +30,8 @@ type Calculation struct {
 	T         [7]float64
 }
 
-type CalcResult struct {
-	Month    string
-	Schedule []AzanSchedule
-}
-
-type AzanSchedule struct {
-	Date    int
-	Fajr    string
-	Sunrise string
-	Zuhr    string
-	Asr     string
-	Maghrib string
-	Isya    string
-}
-
-func New(latitude, longitude, timezone float64, city string) *Calculation {
-	return &Calculation{
+func NewTDjamaluddin(latitude, longitude, timezone float64, city string) *TDjamaluddin {
+	return &TDjamaluddin{
 		Latitude:  latitude,
 		Longitude: longitude,
 		Timezone:  timezone,
@@ -51,18 +39,20 @@ func New(latitude, longitude, timezone float64, city string) *Calculation {
 	}
 }
 
-func (az *Calculation) Calculate() []CalcResult {
+func (az *TDjamaluddin) Calculate() []azan.CalcResult {
 	lamd := az.Longitude / 15.0
 	phi := az.Latitude * Rad
 	tdif := az.Timezone - lamd
 
-	var retVal []CalcResult
+	var retVal []azan.CalcResult
 
 	h := 0.0
 	zd := 0.0
 	n := 0.0
 	for i := 0; i < 12; i++ {
-		cr := CalcResult{}
+		cr := azan.CalcResult{}
+		cr.City = az.City
+		cr.Year = time.Now().Year()
 		cr.Month = TheMonth[i]
 		for k := 0; k < TheDate[i]; k++ {
 			n = n + 1.0
@@ -135,7 +125,7 @@ func (az *Calculation) Calculate() []CalcResult {
 					}
 				}
 			}
-			as := AzanSchedule{}
+			as := azan.AzanSchedule{}
 			as.Date = k + 1
 			for j := 1; j < 7; j++ {
 				var buff string

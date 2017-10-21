@@ -9,31 +9,31 @@ import (
 	calculation "github.com/trihatmaja/Azan-Schedule/calculation"
 )
 
-type CalculationSuite struct {
+type TDjamaluddinSuite struct {
 	suite.Suite
-	Latitude  float64
-	Longitude float64
-	Timezone  float64
-	City      string
-	calc      *calculation.Calculation
+	Latitude     float64
+	Longitude    float64
+	Timezone     float64
+	City         string
+	TDjamaluddin *calculation.TDjamaluddin
 }
 
-func (suite *CalculationSuite) SetupSuite() {
+func (suite *TDjamaluddinSuite) SetupSuite() {
 	suite.Latitude = -6.18
 	suite.Longitude = 106.83
 	suite.Timezone = 7
 	suite.City = "Jakarta"
-	suite.calc = calculation.New(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
+	suite.TDjamaluddin = calculation.NewTDjamaluddin(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
 }
 
-func (suite *CalculationSuite) TestNewCalculation() {
-	c := calculation.New(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
+func (suite *TDjamaluddinSuite) TestNewTDjamaluddin() {
+	c := calculation.NewTDjamaluddin(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
 
 	assert.NotNil(suite.T(), c)
 }
 
-func (suite *CalculationSuite) TestAzanJakarta() {
-	schedule := suite.calc
+func (suite *TDjamaluddinSuite) TestAzanJakarta() {
+	schedule := suite.TDjamaluddin
 	azan := schedule.Calculate()
 
 	assert.NotNil(suite.T(), azan)
@@ -42,6 +42,6 @@ func (suite *CalculationSuite) TestAzanJakarta() {
 	assert.Equal(suite.T(), azan[11].Month, "December")
 }
 
-func TestCalculationSuite(t *testing.T) {
-	suite.Run(t, new(CalculationSuite))
+func TestTDjamaluddinSuite(t *testing.T) {
+	suite.Run(t, new(TDjamaluddinSuite))
 }
