@@ -23,26 +23,17 @@ var (
 )
 
 type TDjamaluddin struct {
-	Latitude  float64
-	Longitude float64
-	Timezone  float64
-	City      string
-	T         [7]float64
+	T [7]float64
 }
 
-func NewTDjamaluddin(latitude, longitude, timezone float64, city string) *TDjamaluddin {
-	return &TDjamaluddin{
-		Latitude:  latitude,
-		Longitude: longitude,
-		Timezone:  timezone,
-		City:      city,
-	}
+func NewTDjamaluddin() *TDjamaluddin {
+	return &TDjamaluddin{}
 }
 
-func (az *TDjamaluddin) Calculate() []azan.CalcResult {
-	lamd := az.Longitude / 15.0
-	phi := az.Latitude * Rad
-	tdif := az.Timezone - lamd
+func (az *TDjamaluddin) Calculate(latitude, longitude, timezone float64, city string) []azan.CalcResult {
+	lamd := longitude / 15.0
+	phi := latitude * Rad
+	tdif := timezone - lamd
 
 	var retVal []azan.CalcResult
 
@@ -51,7 +42,7 @@ func (az *TDjamaluddin) Calculate() []azan.CalcResult {
 	n := 0.0
 	for i := 0; i < 12; i++ {
 		cr := azan.CalcResult{}
-		cr.City = az.City
+		cr.City = city
 		cr.Year = time.Now().Year()
 		cr.Month = TheMonth[i]
 		for k := 0; k < TheDate[i]; k++ {

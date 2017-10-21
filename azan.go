@@ -8,14 +8,25 @@ import (
 // database contract
 type DbInterface interface {
 	Set([]CalcResult) error
-	GetAll() ([]CalcResult, error)
-	GetByCity(string) (CalcResult, error)
-	GetByDate(time.Time) (CalcResult, error)
+	GetAll() ([]DbData, error)
+	GetByCity(string) (DbData, error)
+	GetByDate(time.Time) (DbData, error)
+}
+
+type DbData struct {
+	City    string `json:"city"`
+	Date    string `json:"date"`
+	Fajr    string `json:"fajr"`
+	Sunrise string `json:"sunrise"`
+	Zuhr    string `json:"zuhr"`
+	Asr     string `json:"asr"`
+	Maghrib string `json:"maghrib"`
+	Isya    string `json:"isya"`
 }
 
 // calculation contract
 type CalcInterface interface {
-	Calculate() []CalcResult
+	Calculate(float64, float64, float64, string) []CalcResult
 }
 
 type CalcResult struct {
@@ -35,6 +46,13 @@ type AzanSchedule struct {
 	Isya    string
 }
 
+type ApiRequest struct {
+	Latitude  float64 `json:"lat"`
+	Longitude float64 `json:"long"`
+	TimeZone  float64 `json:"tz"`
+	City      string  `json:"city"`
+}
+
 // azan
 type Azan struct {
 	db   DbInterface
@@ -48,12 +66,16 @@ func New(database DbInterface, calculation CalcInterface) *Azan {
 	}
 }
 
-func (a *Azan) Generate() {
-	res := a.calc.Calculate()
+func (a *Azan) Generate(latitude, longitude, timezone float64, city string) error {
+	res := a.calc.Calculate(latitude, longitude, timezone, city)
 
 	err := a.db.Set(res)
 	if err != nil {
-		log.Println(err.Error())
+		return err
 	}
+	return nil
+}
 
+func (a *Azan) GetAll() ([]DbData, error) {
+	return a.db.GetAll()
 }

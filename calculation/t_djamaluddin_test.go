@@ -23,18 +23,18 @@ func (suite *TDjamaluddinSuite) SetupSuite() {
 	suite.Longitude = 106.83
 	suite.Timezone = 7
 	suite.City = "Jakarta"
-	suite.TDjamaluddin = calculation.NewTDjamaluddin(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
+	suite.TDjamaluddin = calculation.NewTDjamaluddin()
 }
 
 func (suite *TDjamaluddinSuite) TestNewTDjamaluddin() {
-	c := calculation.NewTDjamaluddin(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
+	c := calculation.NewTDjamaluddin()
 
 	assert.NotNil(suite.T(), c)
 }
 
 func (suite *TDjamaluddinSuite) TestAzanJakarta() {
 	schedule := suite.TDjamaluddin
-	azan := schedule.Calculate()
+	azan := schedule.Calculate(suite.Latitude, suite.Longitude, suite.Timezone, suite.City)
 
 	assert.NotNil(suite.T(), azan)
 

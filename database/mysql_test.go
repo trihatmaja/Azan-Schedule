@@ -123,6 +123,80 @@ func (suite *MySQLSuite) TestSet() {
 	assert.Nil(suite.T(), err)
 }
 
+func (suite *MySQLSuite) TestGetAll() {
+	data := []azan.CalcResult{
+		{
+			City:  "jakarta",
+			Month: "January",
+			Year:  2017,
+			Schedule: []azan.AzanSchedule{
+				{
+					Date:    1,
+					Fajr:    "04:00",
+					Sunrise: "05:00",
+					Zuhr:    "12:00",
+					Asr:     "15:00",
+					Maghrib: "18:00",
+					Isya:    "19:00",
+				},
+				{
+					Date:    2,
+					Fajr:    "04:00",
+					Sunrise: "05:00",
+					Zuhr:    "12:00",
+					Asr:     "15:00",
+					Maghrib: "18:00",
+					Isya:    "19:00",
+				},
+			},
+		},
+		{
+			City:  "jakarta",
+			Month: "February",
+			Year:  2017,
+			Schedule: []azan.AzanSchedule{
+				{
+					Date:    1,
+					Fajr:    "04:00",
+					Sunrise: "05:00",
+					Zuhr:    "12:00",
+					Asr:     "15:00",
+					Maghrib: "18:00",
+					Isya:    "19:00",
+				},
+				{
+					Date:    2,
+					Fajr:    "04:00",
+					Sunrise: "05:00",
+					Zuhr:    "12:00",
+					Asr:     "15:00",
+					Maghrib: "18:00",
+					Isya:    "19:00",
+				},
+			},
+		},
+	}
+
+	opt := database.OptionMySQL{
+		User:     suite.User,
+		Password: suite.Password,
+		Host:     suite.Host,
+		Port:     suite.Port,
+		Database: suite.Database,
+		Charset:  suite.Charset,
+	}
+
+	db, _ := database.NewMySQL(opt)
+	db.Set(data)
+
+	k, err := db.GetAll()
+
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), 4, len(k))
+	assert.Equal(suite.T(), "jakarta", k[0].City)
+	assert.Equal(suite.T(), "2017-02-02", k[3].Date)
+}
+
 func TestMySQLSuite(t *testing.T) {
 	suite.Run(t, new(MySQLSuite))
 }

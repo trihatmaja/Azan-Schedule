@@ -1,2 +1,2 @@
-build:
-	go build -o azan cmd/azan/main.go
+cli:
+	go build -o azan cmd/cli/main.go

@@ -1,3 +1,5 @@
 azan
-cmd/azan/azan
+app/cli/cli
+app/cli/schedule.json
 vendor/**/
+.env
