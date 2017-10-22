@@ -38,8 +38,8 @@ func (suite *TDjamaluddinSuite) TestAzanJakarta() {
 
 	assert.NotNil(suite.T(), azan)
 
-	assert.Equal(suite.T(), len(azan), 12)
-	assert.Equal(suite.T(), azan[11].Month, "December")
+	assert.Equal(suite.T(), suite.City, azan.City)
+	assert.Equal(suite.T(), 366, len(azan.Schedule))
 }
 
 func TestTDjamaluddinSuite(t *testing.T) {

@@ -30,21 +30,22 @@ func NewTDjamaluddin() *TDjamaluddin {
 	return &TDjamaluddin{}
 }
 
-func (az *TDjamaluddin) Calculate(latitude, longitude, timezone float64, city string) []azan.CalcResult {
+func (az *TDjamaluddin) Calculate(latitude, longitude, timezone float64, city string) azan.CalcResult {
 	lamd := longitude / 15.0
 	phi := latitude * Rad
 	tdif := timezone - lamd
 
-	var retVal []azan.CalcResult
+	cr := azan.CalcResult{}
+	cr.City = city
+	cr.Latitude = latitude
+	cr.Longitude = longitude
+	cr.Timezone = timezone
 
 	h := 0.0
 	zd := 0.0
 	n := 0.0
 	for i := 0; i < 12; i++ {
-		cr := azan.CalcResult{}
-		cr.City = city
-		cr.Year = time.Now().Year()
-		cr.Month = TheMonth[i]
+		// cr.Month = TheMonth[i]
 		for k := 0; k < TheDate[i]; k++ {
 			n = n + 1.0
 			a := 6.0
@@ -117,7 +118,7 @@ func (az *TDjamaluddin) Calculate(latitude, longitude, timezone float64, city st
 				}
 			}
 			as := azan.AzanSchedule{}
-			as.Date = k + 1
+			as.Date = fmt.Sprintf("%d-%s-%d", time.Now().Year(), TheMonth[i], k+1)
 			for j := 1; j < 7; j++ {
 				var buff string
 				th := int32(az.T[j])                        // hour
@@ -155,9 +156,7 @@ func (az *TDjamaluddin) Calculate(latitude, longitude, timezone float64, city st
 			}
 			cr.Schedule = append(cr.Schedule, as)
 		}
-
-		retVal = append(retVal, cr)
 	}
 
-	return retVal
+	return cr
 }

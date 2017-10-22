@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	gotenv.Load("../../.env")
+	gotenv.Load()
 
 	dbOpt := database.OptionMySQL{
 		User:     os.Getenv("MYSQL_USER"),
@@ -36,6 +36,7 @@ func main() {
 	router := httprouter.New()
 	router.GET("/healthz", azHandler.Healthz)
 	router.POST("/generate", azHandler.Generate)
+	router.GET("/city/:city", azHandler.ByCity)
 	router.GET("/", azHandler.All)
 
 	http.ListenAndServe(":1234", router)

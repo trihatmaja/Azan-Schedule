@@ -23,9 +23,18 @@ type MySQLSuite struct {
 	Charset  string
 }
 
-func (suite *MySQLSuite) TearDownSuite() {
+func (suite *MySQLSuite) TearDownTest() {
 	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s", suite.User, suite.Password, suite.Host, suite.Port, suite.Database, suite.Charset))
-	db.Exec("truncate table azan.azan")
+	tx, _ := db.Begin()
+	_, err := tx.Exec("truncate table city")
+	if err != nil {
+		tx.Rollback()
+	}
+	_, err = tx.Exec("truncate table schedule")
+	if err != nil {
+		tx.Rollback()
+	}
+	tx.Commit()
 }
 
 func (suite *MySQLSuite) SetupSuite() {
@@ -54,55 +63,29 @@ func (suite *MySQLSuite) TestConnections() {
 }
 
 func (suite *MySQLSuite) TestSet() {
-	data := []azan.CalcResult{
-		{
-			City:  "jakarta",
-			Month: "January",
-			Year:  2017,
-			Schedule: []azan.AzanSchedule{
-				{
-					Date:    1,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
-				{
-					Date:    2,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-January-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
 			},
-		},
-		{
-			City:  "jakarta",
-			Month: "February",
-			Year:  2017,
-			Schedule: []azan.AzanSchedule{
-				{
-					Date:    1,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
-				{
-					Date:    2,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
+			{
+				Date:    "2017-January-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
 			},
 		},
 	}
@@ -124,55 +107,29 @@ func (suite *MySQLSuite) TestSet() {
 }
 
 func (suite *MySQLSuite) TestGetAll() {
-	data := []azan.CalcResult{
-		{
-			City:  "jakarta",
-			Month: "January",
-			Year:  2017,
-			Schedule: []azan.AzanSchedule{
-				{
-					Date:    1,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
-				{
-					Date:    2,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-February-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
 			},
-		},
-		{
-			City:  "jakarta",
-			Month: "February",
-			Year:  2017,
-			Schedule: []azan.AzanSchedule{
-				{
-					Date:    1,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
-				{
-					Date:    2,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
+			{
+				Date:    "2017-February-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
 			},
 		},
 	}
@@ -192,9 +149,59 @@ func (suite *MySQLSuite) TestGetAll() {
 	k, err := db.GetAll()
 
 	assert.Nil(suite.T(), err)
-	assert.Equal(suite.T(), 4, len(k))
+	assert.Equal(suite.T(), 1, len(k))
 	assert.Equal(suite.T(), "jakarta", k[0].City)
-	assert.Equal(suite.T(), "2017-02-02", k[3].Date)
+	assert.Equal(suite.T(), 2, len(k[0].Schedule))
+	assert.Equal(suite.T(), "2017-02-02", k[0].Schedule[1].Date)
+}
+
+func (suite *MySQLSuite) TestGetByCity() {
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-March-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+			{
+				Date:    "2017-March-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+		},
+	}
+
+	opt := database.OptionMySQL{
+		User:     suite.User,
+		Password: suite.Password,
+		Host:     suite.Host,
+		Port:     suite.Port,
+		Database: suite.Database,
+		Charset:  suite.Charset,
+	}
+
+	db, _ := database.NewMySQL(opt)
+	db.Set(data)
+
+	k, err := db.GetByCity("Jakarta")
+
+	assert.Nil(suite.T(), err)
+	assert.NotNil(suite.T(), k)
+	assert.Equal(suite.T(), 2, len(k.Schedule))
+	assert.Equal(suite.T(), "2017-03-01", k.Schedule[0].Date)
+
 }
 
 func TestMySQLSuite(t *testing.T) {

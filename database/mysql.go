@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -34,39 +34,76 @@ func NewMySQL(opt OptionMySQL) (*MySQL, error) {
 	return &MySQL{db: db}, nil
 }
 
-func (m *MySQL) Set(data []azan.CalcResult) error {
-	for _, v1 := range data {
-		for _, v2 := range v1.Schedule {
-			tm, err := time.Parse("2006-January-2", fmt.Sprintf("%d-%s-%d", v1.Year, v1.Month, v2.Date))
-			if err != nil {
-				continue
-			}
-			_, err = m.db.Exec("INSERT INTO azan(city, dt, fajr, sunrise, zuhr, asr, maghrib, isya) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", v1.City, tm, v2.Fajr, v2.Sunrise, v2.Zuhr, v2.Asr, v2.Maghrib, v2.Isya)
-			if err != nil {
-				log.Println(err)
-				return err
-			}
+func (m *MySQL) Set(data azan.CalcResult) error {
+
+	tx, err := m.db.Begin()
+
+	res, err := tx.Exec("INSERT INTO city(city, latitude, longitude, timezone) VALUES(?, ?, ?, ?)", strings.ToLower(data.City), data.Latitude, data.Longitude, data.Timezone)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	city_id, err := res.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	for _, v2 := range data.Schedule {
+		tm, err := time.Parse("2006-January-2", v2.Date)
+		if err != nil {
+			continue
+		}
+
+		_, err = tx.Exec("INSERT INTO schedule(city_id, dt, fajr, sunrise, zuhr, asr, maghrib, isya) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", city_id, tm, v2.Fajr, v2.Sunrise, v2.Zuhr, v2.Asr, v2.Maghrib, v2.Isya)
+		if err != nil {
+			tx.Rollback()
+			return err
 		}
 	}
+
+	tx.Commit()
+
 	return nil
 }
 
-func (m *MySQL) GetAll() ([]azan.DbData, error) {
-	var retval []azan.DbData
+func (m *MySQL) GetAll() ([]azan.CalcResult, error) {
+	var retval []azan.CalcResult
 
-	rows, err := m.db.Query(`select * from azan`)
+	rows1, err := m.db.Query(`select * from city`)
 	if err != nil {
-		return []azan.DbData{}, err
+		return []azan.CalcResult{}, err
 	}
 
-	defer rows.Close()
-	for rows.Next() {
-		var id int
-		var dt azan.DbData
+	defer rows1.Close()
 
-		err = rows.Scan(&id, &dt.City, &dt.Date, &dt.Fajr, &dt.Sunrise, &dt.Zuhr, &dt.Asr, &dt.Maghrib, &dt.Isya)
+	for rows1.Next() {
+		var cityId int
+		var dt azan.CalcResult
+
+		err = rows1.Scan(&cityId, &dt.City, &dt.Latitude, &dt.Longitude, &dt.Timezone)
 		if err != nil {
-			return []azan.DbData{}, err
+			return []azan.CalcResult{}, err
+		}
+
+		rows2, err := m.db.Query(`select * from schedule where city_id = ?`, cityId)
+		if err != nil {
+			return []azan.CalcResult{}, err
+		}
+
+		defer rows2.Close()
+
+		for rows2.Next() {
+			var as azan.AzanSchedule
+			var scheduleId int
+			var ccity_id int
+			err = rows2.Scan(&scheduleId, &ccity_id, &as.Date, &as.Fajr, &as.Sunrise, &as.Zuhr, &as.Asr, &as.Maghrib, &as.Isya)
+			if err != nil {
+				return []azan.CalcResult{}, err
+			}
+
+			dt.Schedule = append(dt.Schedule, as)
 		}
 
 		retval = append(retval, dt)
@@ -76,10 +113,40 @@ func (m *MySQL) GetAll() ([]azan.DbData, error) {
 
 }
 
-func (m *MySQL) GetByCity(city string) (azan.DbData, error) {
-	return azan.DbData{}, errors.New("Not Implemented Yet")
+func (m *MySQL) GetByCity(city string) (azan.CalcResult, error) {
+	var retval azan.CalcResult
+
+	rows1 := m.db.QueryRow(`select * from city where city = ?`, strings.ToLower(city))
+
+	var cityId int
+
+	err := rows1.Scan(&cityId, &retval.City, &retval.Latitude, &retval.Longitude, &retval.Timezone)
+	if err != nil {
+		return azan.CalcResult{}, err
+	}
+
+	rows2, err := m.db.Query(`select * from schedule where city_id = ?`, cityId)
+	if err != nil {
+		return azan.CalcResult{}, err
+	}
+
+	defer rows2.Close()
+
+	for rows2.Next() {
+		var as azan.AzanSchedule
+		var scheduleId int
+		var ccity_id int
+		err = rows2.Scan(&scheduleId, &ccity_id, &as.Date, &as.Fajr, &as.Sunrise, &as.Zuhr, &as.Asr, &as.Maghrib, &as.Isya)
+		if err != nil {
+			return azan.CalcResult{}, err
+		}
+
+		retval.Schedule = append(retval.Schedule, as)
+	}
+
+	return retval, nil
 }
 
-func (m *MySQL) GetByDate(date time.Time) (azan.DbData, error) {
-	return azan.DbData{}, errors.New("Not Implemented Yet")
+func (m *MySQL) GetByDate(date time.Time) (azan.CalcResult, error) {
+	return azan.CalcResult{}, errors.New("Not Implemented Yet")
 }

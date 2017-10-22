@@ -45,59 +45,32 @@ func (suite *FilesSuite) TestSet() {
 
 	db := database.NewFiles(opt)
 
-	data := []azan.CalcResult{
-		{
-			City:  "jakarta",
-			Month: "January",
-			Year:  2017,
-			Schedule: []azan.AzanSchedule{
-				{
-					Date:    1,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
-				{
-					Date:    2,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-January-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
 			},
-		},
-		{
-			City:  "jakarta",
-			Month: "February",
-			Year:  2017,
-			Schedule: []azan.AzanSchedule{
-				{
-					Date:    1,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
-				{
-					Date:    2,
-					Fajr:    "04:00",
-					Sunrise: "05:00",
-					Zuhr:    "12:00",
-					Asr:     "15:00",
-					Maghrib: "18:00",
-					Isya:    "19:00",
-				},
+			{
+				Date:    "2017-January-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
 			},
 		},
 	}
-
 	err := db.Set(data)
 
 	assert.Nil(suite.T(), err)

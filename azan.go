@@ -1,43 +1,34 @@
 package azan
 
 import (
-	"log"
+	"errors"
 	"time"
 )
 
 // database contract
 type DbInterface interface {
-	Set([]CalcResult) error
-	GetAll() ([]DbData, error)
-	GetByCity(string) (DbData, error)
-	GetByDate(time.Time) (DbData, error)
-}
-
-type DbData struct {
-	City    string `json:"city"`
-	Date    string `json:"date"`
-	Fajr    string `json:"fajr"`
-	Sunrise string `json:"sunrise"`
-	Zuhr    string `json:"zuhr"`
-	Asr     string `json:"asr"`
-	Maghrib string `json:"maghrib"`
-	Isya    string `json:"isya"`
+	Set(CalcResult) error
+	GetAll() ([]CalcResult, error)
+	GetByCity(string) (CalcResult, error)
+	GetByDate(time.Time) (CalcResult, error)
 }
 
 // calculation contract
 type CalcInterface interface {
-	Calculate(float64, float64, float64, string) []CalcResult
+	// latitude, longitude, timezone, city
+	Calculate(float64, float64, float64, string) CalcResult
 }
 
 type CalcResult struct {
-	City     string
-	Month    string
-	Year     int
-	Schedule []AzanSchedule
+	City      string
+	Latitude  float64
+	Longitude float64
+	Timezone  float64
+	Schedule  []AzanSchedule
 }
 
 type AzanSchedule struct {
-	Date    int
+	Date    string
 	Fajr    string
 	Sunrise string
 	Zuhr    string
@@ -67,6 +58,10 @@ func New(database DbInterface, calculation CalcInterface) *Azan {
 }
 
 func (a *Azan) Generate(latitude, longitude, timezone float64, city string) error {
+	test, _ := a.db.GetByCity(city)
+	if test.City != "" {
+		return errors.New("city exist")
+	}
 	res := a.calc.Calculate(latitude, longitude, timezone, city)
 
 	err := a.db.Set(res)
@@ -76,6 +71,10 @@ func (a *Azan) Generate(latitude, longitude, timezone float64, city string) erro
 	return nil
 }
 
-func (a *Azan) GetAll() ([]DbData, error) {
+func (a *Azan) GetAll() ([]CalcResult, error) {
 	return a.db.GetAll()
+}
+
+func (a *Azan) GetByCity(city string) (CalcResult, error) {
+	return a.db.GetByCity(city)
 }
