@@ -45,6 +45,7 @@ func main() {
 
 	router := httprouter.New()
 	router.GET("/healthz", azHandler.Healthz)
+	router.GET("/metrics", azHandler.Metrics)
 	router.POST("/generate", azHandler.Generate)
 	router.GET("/city/:city", azHandler.ByCity)
 	router.GET("/", azHandler.All)

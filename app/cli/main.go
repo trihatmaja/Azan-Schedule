@@ -9,6 +9,7 @@ import (
 
 	azan "github.com/trihatmaja/Azan-Schedule"
 
+	"github.com/trihatmaja/Azan-Schedule/cache"
 	"github.com/trihatmaja/Azan-Schedule/calculation"
 	"github.com/trihatmaja/Azan-Schedule/database"
 
@@ -40,9 +41,17 @@ func main() {
 
 				db := database.NewFiles(opt)
 
+				// memcached not used in this command line
+				cOpt := cache.OptionsMemcached{
+					Server:    strings.Split(os.Getenv("MEMCACHED_HOST"), ","),
+					PrefixKey: os.Getenv("MEMCACHED_PREFIX_KEY"),
+				}
+
+				mcached := cache.NewMemcached(cOpt)
+
 				calc := calculation.NewTDjamaluddin()
 
-				az := azan.New(db, calc)
+				az := azan.New(db, mcached, calc)
 				az.Generate(latitude, longitude, timezone, city)
 				return nil
 			},
