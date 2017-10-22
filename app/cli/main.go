@@ -1,5 +1,7 @@
 /*
 	this is implementation azan in the form of cli
+	the memcache not used in this command line interface apps
+	but need to be declared
 */
 
 package main
@@ -42,6 +44,7 @@ func main() {
 				db := database.NewFiles(opt)
 
 				// memcached not used in this command line
+				// but still need to be declared
 				cOpt := cache.OptionsMemcached{
 					Server:    strings.Split(os.Getenv("MEMCACHED_HOST"), ","),
 					PrefixKey: os.Getenv("MEMCACHED_PREFIX_KEY"),

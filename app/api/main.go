@@ -1,3 +1,7 @@
+/*
+	The api implement mysql db, memcached, and Dr. T. Djamaluddin calculation
+*/
+
 package main
 
 import (
@@ -17,7 +21,7 @@ import (
 )
 
 func main() {
-	gotenv.Load("../../.env")
+	gotenv.Load(".env")
 
 	dbOpt := database.OptionMySQL{
 		User:     os.Getenv("MYSQL_USER"),
