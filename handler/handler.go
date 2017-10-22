@@ -10,12 +10,17 @@ import (
 	az "github.com/trihatmaja/Azan-Schedule"
 )
 
-// Handler controls request flow from client to service
 type Handler struct {
 	azan *az.Azan
 }
 
-// NewHandler returns a pointer of Handler instance
+type ApiRequest struct {
+	Latitude  float64 `json:"lat"`
+	Longitude float64 `json:"long"`
+	TimeZone  float64 `json:"tz"`
+	City      string  `json:"city"`
+}
+
 func NewHandler(azan *az.Azan) *Handler {
 	return &Handler{
 		azan: azan,
@@ -34,7 +39,7 @@ func (h *Handler) Generate(w http.ResponseWriter, r *http.Request, params httpro
 		return
 	}
 
-	var req az.ApiRequest
+	var req ApiRequest
 
 	err = json.Unmarshal(body, &req)
 	if err != nil {
@@ -54,6 +59,14 @@ func (h *Handler) Generate(w http.ResponseWriter, r *http.Request, params httpro
 }
 
 func (h *Handler) All(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	key := r.RequestURI
+
+	c, err := h.azan.GetCache(key)
+	if err == nil {
+		writeSuccess(w, string(c))
+		return
+	}
+
 	dt, err := h.azan.GetAll()
 	if err != nil {
 		writeError(w, err, 500)
@@ -66,10 +79,22 @@ func (h *Handler) All(w http.ResponseWriter, r *http.Request, params httprouter.
 		return
 	}
 
+	go func() {
+		h.azan.SetCache(key, retval)
+	}()
+
 	writeSuccess(w, string(retval))
 }
 
 func (h *Handler) ByCity(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	key := r.RequestURI
+
+	c, err := h.azan.GetCache(key)
+	if err == nil {
+		writeSuccess(w, string(c))
+		return
+	}
+
 	dt, err := h.azan.GetByCity(params.ByName("city"))
 	if err != nil {
 		writeError(w, err, 500)
@@ -81,6 +106,10 @@ func (h *Handler) ByCity(w http.ResponseWriter, r *http.Request, params httprout
 		writeError(w, err, 500)
 		return
 	}
+
+	go func() {
+		h.azan.SetCache(key, retval)
+	}()
 
 	writeSuccess(w, string(retval))
 }
