@@ -2,17 +2,51 @@
 
 This application to generate Azan Schedule or Sholat Schedule based on position(latitude, longitude, and timezone). This can be used at the smartphone if golang already support for android/ios.
 
-#### How To Use
- 1. Run `govendor sync`
- 2. Build the application using `make build`
- 3. Run `./azan --latitude=-6.18 --longitude=106.83 --timezone=+7 --city=jakarta`
+## How To Use
 
-### Next
-1. Insert the azan file azan.ogg
-2. Generate cron job file based on the time generated to execute azan file. But the user should install the cron job file by himself
+### Get Dependency
 
-### License
-Copyright (c) 2015 Dr. T. Djamaluddin, Wastono ST, Wicaksono Trihatmaja 
+1. Run `govendor sync`
+
+### Build CLI
+
+If you want to generate files that set the azan schedule, build the cli
+
+1. Build the application using `make cli`
+2. Run `./azan_cli --latitude=-6.18 --longitude=106.83 --timezone=+7 --city=jakarta`
+
+### Build API Server
+
+If you want to setup server for azan schedule, you can build the api server
+
+#### Dependency
+
+1. MYSQL
+2. MEMCACHED
+
+#### Build
+
+1. Build the api server using `make api`
+2. Change env.sample to .env and edit the value as you need
+3. Run `./azan_api`
+4. Apps will listen on port 1234
+
+## How To Develop
+
+### Calculation
+
+You may develop your own calculation implementation, see `provider.go` for the contract about the calculation function and place it under calculation package
+
+### Database
+
+You may develop your own database implementation (if you want to use other db other than mysql), see `provider.go` for the contract about database function and place it under database package
+
+### Cache
+
+You may develop your own cache implementation (if you want to use other cache engine other than memcache), see `provider.go` for the contract about cache function and place it under cache package
+
+## The MIT License (MIT)
+Copyright (c) 2015 Dr. T. Djamaluddin, Wastono ST
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,3 +57,12 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
