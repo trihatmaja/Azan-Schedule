@@ -38,6 +38,7 @@ func ResponseSuccess(data, meta interface{}) SuccessBody {
 
 func ResponseWrite(w http.ResponseWriter, result interface{}) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(result)
 }
 

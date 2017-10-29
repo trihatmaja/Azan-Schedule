@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 	"github.com/subosito/gotenv"
 
 	azan "github.com/trihatmaja/Azan-Schedule"
@@ -21,7 +22,7 @@ import (
 )
 
 func main() {
-	gotenv.Load(".env")
+	gotenv.Load("../../.env")
 
 	dbOpt := database.OptionMySQL{
 		User:     os.Getenv("MYSQL_USER"),
@@ -48,11 +49,16 @@ func main() {
 	azHandler := handler.NewHandler(az)
 
 	router := httprouter.New()
-	router.GET("/healthz", azHandler.Healthz)
-	router.GET("/metrics", azHandler.Metrics)
-	router.POST("/generate", azHandler.Generate)
-	router.GET("/city/:city", azHandler.ByCity)
-	router.GET("/", azHandler.All)
+	router.GET("/api/healthz", azHandler.Healthz)
+	router.GET("/api/metrics", azHandler.Metrics)
+	router.POST("/api/generate", azHandler.Generate)
+	router.GET("/api/cities/", azHandler.ByCities)
+	router.GET("/api/cities/:city", azHandler.ByCity)
+	router.GET("/api/cities/:city/date/:date", azHandler.ByCityDate)
+	router.GET("/api/cities/:city/month/:month", azHandler.ByCityMonth)
+	//router.GET("/api/", azHandler.All)
 
-	http.ListenAndServe(":1234", router)
+	handler := cors.Default().Handler(router)
+
+	http.ListenAndServe(":1234", handler)
 }

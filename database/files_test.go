@@ -76,6 +76,23 @@ func (suite *FilesSuite) TestSet() {
 	assert.Nil(suite.T(), err)
 }
 
+func (suite *FilesSuite) TestValidate() {
+	opt := database.OptionFiles{
+		OutputDir: suite.OutputDir,
+		FileName:  suite.FileName,
+	}
+
+	db := database.NewFiles(opt)
+
+	var lat float64 = -6.82
+	var long float64 = 106.83
+
+	k, e := db.Validate(lat, long, "jakarta")
+
+	assert.Nil(suite.T(), e)
+	assert.Equal(suite.T(), true, k)
+}
+
 func TestFilesSuite(t *testing.T) {
 	suite.Run(t, new(FilesSuite))
 }

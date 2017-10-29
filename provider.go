@@ -7,9 +7,12 @@ import (
 // database contract
 type DbProvider interface {
 	Set(CalcResult) error
+	Validate(float64, float64, string) (bool, error)
 	GetAll() ([]CalcResult, error)
 	GetByCity(string) (CalcResult, error)
-	GetByDate(time.Time) (CalcResult, error)
+	GetByCityDate(string, time.Time) (CalcResult, error)
+	GetByCityMonth(string, int) (CalcResult, error)
+	GetCities() ([]CalcResult, error)
 }
 
 // cache contract
@@ -25,19 +28,19 @@ type CalcProvider interface {
 }
 
 type CalcResult struct {
-	City      string
-	Latitude  float64
-	Longitude float64
-	Timezone  float64
-	Schedule  []AzanSchedule
+	City      string         `json:"city"`
+	Latitude  float64        `json:"lat"`
+	Longitude float64        `json:"long"`
+	Timezone  float64        `json:"timezone"`
+	Schedule  []AzanSchedule `json:"schedule"`
 }
 
 type AzanSchedule struct {
-	Date    string
-	Fajr    string
-	Sunrise string
-	Zuhr    string
-	Asr     string
-	Maghrib string
-	Isya    string
+	Date    string `json:"date"`
+	Fajr    string `json:"fajr"`
+	Sunrise string `json:"sunrise"`
+	Zuhr    string `json:"zuhr"`
+	Asr     string `json:"asr"`
+	Maghrib string `json:"maghrib"`
+	Isya    string `json:"isya"`
 }

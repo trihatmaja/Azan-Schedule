@@ -39,6 +39,10 @@ func (f *Files) Set(data azan.CalcResult) error {
 	return ioutil.WriteFile(path.Join(f.OutputDir, f.FileName), js, 0644)
 }
 
+func (f *Files) Validate(lat, long float64, city string) (bool, error) {
+	return true, nil
+}
+
 func (f *Files) GetAll() ([]azan.CalcResult, error) {
 	return []azan.CalcResult{}, errors.New("Not Implemented Yet")
 }

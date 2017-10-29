@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -30,6 +31,7 @@ func NewHandler(azan *az.Azan) *Handler {
 
 func (h *Handler) Healthz(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprintln(w, "ok")
 }
 
@@ -66,51 +68,9 @@ func (h *Handler) Generate(w http.ResponseWriter, r *http.Request, params httpro
 		return
 	}
 
-	rsp, _ := json.Marshal(req)
-
-	writeSuccess(w, string(rsp))
+	writeSuccess(w, req)
 	elapsedTime := time.Since(startTime).Seconds()
 	TraceRequestTime(r.Method, "generate", "ok", elapsedTime)
-}
-
-func (h *Handler) All(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	startTime := time.Now()
-
-	key := r.RequestURI
-
-	c, err := h.azan.GetCache(key)
-	if err == nil {
-		writeSuccess(w, string(c))
-		elapsedTime := time.Since(startTime).Seconds()
-		TraceRequestTime(r.Method, "all", "ok", elapsedTime)
-		TraceRequestTimeCache(r.Method, "all", "HIT", elapsedTime)
-		return
-	}
-
-	dt, err := h.azan.GetAll()
-	if err != nil {
-		writeError(w, err, 500)
-		elapsedTime := time.Since(startTime).Seconds()
-		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
-		return
-	}
-
-	retval, err := json.Marshal(dt)
-	if err != nil {
-		writeError(w, err, 500)
-		elapsedTime := time.Since(startTime).Seconds()
-		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
-		return
-	}
-
-	go func() {
-		h.azan.SetCache(key, retval)
-	}()
-
-	writeSuccess(w, string(retval))
-	elapsedTime := time.Since(startTime).Seconds()
-	TraceRequestTime(r.Method, "all", "ok", elapsedTime)
-	TraceRequestTimeCache(r.Method, "all", "MISS", elapsedTime)
 }
 
 func (h *Handler) ByCity(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -120,7 +80,9 @@ func (h *Handler) ByCity(w http.ResponseWriter, r *http.Request, params httprout
 
 	c, err := h.azan.GetCache(key)
 	if err == nil {
-		writeSuccess(w, string(c))
+		an := az.CalcResult{}
+		json.Unmarshal(c, &an)
+		writeSuccess(w, an)
 		elapsedTime := time.Since(startTime).Seconds()
 		TraceRequestTime(r.Method, "all", "ok", elapsedTime)
 		TraceRequestTimeCache(r.Method, "all", "HIT", elapsedTime)
@@ -147,7 +109,148 @@ func (h *Handler) ByCity(w http.ResponseWriter, r *http.Request, params httprout
 		h.azan.SetCache(key, retval)
 	}()
 
-	writeSuccess(w, string(retval))
+	writeSuccess(w, dt)
+	elapsedTime := time.Since(startTime).Seconds()
+	TraceRequestTime(r.Method, "all", "ok", elapsedTime)
+	TraceRequestTimeCache(r.Method, "all", "MISS", elapsedTime)
+}
+
+func (h *Handler) ByCityDate(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	startTime := time.Now()
+
+	key := r.RequestURI
+
+	c, err := h.azan.GetCache(key)
+	if err == nil {
+		an := az.CalcResult{}
+		json.Unmarshal(c, &an)
+		writeSuccess(w, an)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "ok", elapsedTime)
+		TraceRequestTimeCache(r.Method, "all", "HIT", elapsedTime)
+		return
+	}
+
+	tm, err := time.Parse("20060102", params.ByName("date"))
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+	dt, err := h.azan.GetByCityDate(params.ByName("city"), tm)
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+
+	retval, err := json.Marshal(dt)
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+
+	go func() {
+		h.azan.SetCache(key, retval)
+	}()
+
+	writeSuccess(w, dt)
+	elapsedTime := time.Since(startTime).Seconds()
+	TraceRequestTime(r.Method, "all", "ok", elapsedTime)
+	TraceRequestTimeCache(r.Method, "all", "MISS", elapsedTime)
+}
+
+func (h *Handler) ByCityMonth(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	startTime := time.Now()
+
+	key := r.RequestURI
+
+	c, err := h.azan.GetCache(key)
+	if err == nil {
+		an := az.CalcResult{}
+		json.Unmarshal(c, &an)
+		writeSuccess(w, an)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "ok", elapsedTime)
+		TraceRequestTimeCache(r.Method, "all", "HIT", elapsedTime)
+		return
+	}
+
+	i, err := strconv.Atoi(params.ByName("month"))
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+
+	dt, err := h.azan.GetByCityMonth(params.ByName("city"), i)
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+
+	retval, err := json.Marshal(dt)
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+
+	go func() {
+		h.azan.SetCache(key, retval)
+	}()
+
+	writeSuccess(w, dt)
+	elapsedTime := time.Since(startTime).Seconds()
+	TraceRequestTime(r.Method, "all", "ok", elapsedTime)
+	TraceRequestTimeCache(r.Method, "all", "MISS", elapsedTime)
+}
+
+func (h *Handler) ByCities(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	startTime := time.Now()
+
+	key := r.RequestURI
+
+	c, err := h.azan.GetCache(key)
+	if err == nil {
+		an := []az.CalcResult{}
+		json.Unmarshal(c, &an)
+		writeSuccess(w, an)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "ok", elapsedTime)
+		TraceRequestTimeCache(r.Method, "all", "HIT", elapsedTime)
+		return
+	}
+
+	dt, err := h.azan.GetCities()
+	if err != nil {
+		writeError(w, err, 500)
+		elapsedTime := time.Since(startTime).Seconds()
+		TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+		return
+	}
+
+	go func() {
+		retval, err := json.Marshal(dt)
+		if err != nil {
+			writeError(w, err, 500)
+			elapsedTime := time.Since(startTime).Seconds()
+			TraceRequestTime(r.Method, "all", "fail", elapsedTime)
+			return
+		}
+
+		h.azan.SetCache(key, retval)
+	}()
+
+	writeSuccess(w, dt)
 	elapsedTime := time.Since(startTime).Seconds()
 	TraceRequestTime(r.Method, "all", "ok", elapsedTime)
 	TraceRequestTimeCache(r.Method, "all", "MISS", elapsedTime)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -202,6 +203,148 @@ func (suite *MySQLSuite) TestGetByCity() {
 	assert.Equal(suite.T(), 2, len(k.Schedule))
 	assert.Equal(suite.T(), "2017-03-01", k.Schedule[0].Date)
 
+}
+
+func (suite *MySQLSuite) TestValidate() {
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-April-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+			{
+				Date:    "2017-April-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+		},
+	}
+
+	opt := database.OptionMySQL{
+		User:     suite.User,
+		Password: suite.Password,
+		Host:     suite.Host,
+		Port:     suite.Port,
+		Database: suite.Database,
+		Charset:  suite.Charset,
+	}
+
+	db, _ := database.NewMySQL(opt)
+	db.Set(data)
+
+	k, err := db.Validate(data.Latitude, data.Longitude, "jakarta")
+
+	assert.Nil(suite.T(), err)
+	assert.NotNil(suite.T(), k)
+	assert.Equal(suite.T(), true, k)
+}
+
+func (suite *MySQLSuite) TestGetByCityDate() {
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-April-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+			{
+				Date:    "2017-April-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+		},
+	}
+
+	opt := database.OptionMySQL{
+		User:     suite.User,
+		Password: suite.Password,
+		Host:     suite.Host,
+		Port:     suite.Port,
+		Database: suite.Database,
+		Charset:  suite.Charset,
+	}
+
+	db, _ := database.NewMySQL(opt)
+	db.Set(data)
+
+	d, _ := time.Parse("2006-01-02", "2017-04-02")
+
+	k, err := db.GetByCityDate("jakarta", d)
+
+	assert.Nil(suite.T(), err)
+	assert.NotNil(suite.T(), k)
+}
+
+func (suite *MySQLSuite) TestGetByCityMonth() {
+	data := azan.CalcResult{
+		City:      "Jakarta",
+		Latitude:  -6.18,
+		Longitude: 106.83,
+		Timezone:  7,
+		Schedule: []azan.AzanSchedule{
+			{
+				Date:    "2017-April-1",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+			{
+				Date:    "2017-April-2",
+				Fajr:    "04:00",
+				Sunrise: "05:00",
+				Zuhr:    "12:00",
+				Asr:     "15:00",
+				Maghrib: "18:00",
+				Isya:    "19:00",
+			},
+		},
+	}
+
+	opt := database.OptionMySQL{
+		User:     suite.User,
+		Password: suite.Password,
+		Host:     suite.Host,
+		Port:     suite.Port,
+		Database: suite.Database,
+		Charset:  suite.Charset,
+	}
+
+	db, _ := database.NewMySQL(opt)
+	db.Set(data)
+
+	k, err := db.GetByCityMonth("jakarta", 4)
+
+	assert.Nil(suite.T(), err)
+	assert.NotNil(suite.T(), k)
+	assert.Equal(suite.T(), 2, len(k.Schedule))
 }
 
 func TestMySQLSuite(t *testing.T) {

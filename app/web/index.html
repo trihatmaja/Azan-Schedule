@@ -1,0 +1,196 @@
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Jadwal Sholat &#47; Waktu Azan</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta name="description" content="Jadwal Sholat atau Waktu Sholat Versi Baru dan Terupdate untuk wilayah Jakarta dan Seluruh Indonesia" />
+		<meta name="keywords" content="jadwal sholat, waktu sholat, sholat, shalat, jadwal shalat, waktu shalat, azan, waktu azan, jadwal azan, azan" />
+		<!-- <link rel="canonical" href="https://jadwalsholat.pkpu.or.id/" /> -->
+		<meta property="og:locale" content="id_ID" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Jadwal Sholat &#47; Waktu Azan" />
+		<meta property="og:description" content="Jadwal Sholat atau Waktu Azan" />
+		<!-- <meta property="og:url" content="https://jadwalsholat.pkpu.or.id/" /> -->
+		<meta property="og:site_name" content="Jadwal Sholat" />
+		<!-- <meta property="og:image" content="https://jadwalsholat.pkpu.or.id/images/pkpu.png" /> -->
+		<meta property="og:image:width" content="96" />
+		<meta property="og:image:height" content="32" />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:description" content="Jadwal Sholat atau Waktu Azan" />
+		<meta name="twitter:title" content="Jadwal Sholat &#47; Waktu Azan" />
+		<!-- <meta name="twitter:image" content="https://jadwalsholat.pkpu.or.id/images/pkpu.png" /> -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	</head>
+	<body>
+		<div class="container" id="app">
+		    <h1 class="text-center">Jadwal Sholat / Jadwal Azan</h3>
+		    <hr>
+	    	<div class="jumbotron">
+				<h1 class="display-3">Assalamu'alaykum, world!</h1>
+				<p class="lead">Ini adalah aplikasi Jadwal Sholat / Jadwal Azan menggunakan perhitungan latitude (garis lintang) dan longitude (garis bujur) suatu kota/daerah.</p>
+				<hr class="my-4">
+				<p>Nilai lintang dan bujur yang digunakan adalah desimal, bukan degree minutes seconds (DMS).</p>
+				<p class="lead">
+				<a class="btn btn-primary btn-lg" href="#" role="button">Lebih Lanjut</a>
+				</p>
+			</div>
+			<div class="alert alert-danger" role="alert">
+				<h4 class="alert-heading">Perhatian!</h4>
+				<p>Jadwal ini merupakan hasil perhitungan, jadi jangan menjadikan ini sebagai acuan pasti. Usahakan mendengar azan disekitar anda, kecuali jika sangat terpaksa dan tidak terdengar azan.</p>
+			</div>
+			<div class="form-group">
+			<label for="city">Pilih Kota</label>
+		    <select v-model="selectedCity" class="form-control" id="city">
+		    	<option v-for="option in cityOptions" v-bind:value="option.value">
+					{{ option.text }}
+				</option>
+		    </select>
+			</div>
+		    <br>
+
+		    <h4>Hari Ini</h4>
+		    <table class="table table-hover">
+		    	<thead class="thead-light">
+		    	<tr>
+		    		<th>
+		    			Tanggal
+		    		</th>
+		    		<th>
+		    			Subuh
+		    		</th>
+		    		<th>
+		    			Terbit Matahari
+		    		</th>
+		    		<th>
+		    			Dhuhur
+		    		</th>
+		    		<th>
+		    			Ashar
+		    		</th>
+		    		<th>
+		    			Maghrib
+		    		</th>
+		    		<th>
+		    			Isya
+		    		</th>
+		    	</tr>
+		    	</thead>
+		    	<tr v-for="td in today">
+		    		<td>
+		    			{{td.date | formatDate}}
+		    		</td>
+		    		<td>
+		    			{{td.fajr}}
+		    		</td>
+		    		<td>
+		    			{{td.sunrise}}
+		    		</td>
+		    		<td>
+		    			{{td.zuhr}}
+		    		</td>
+		    		<td>
+		    			{{td.asr}}
+		    		</td>
+		    		<td>
+		    			{{td.maghrib}}
+		    		</td>
+		    		<td>
+		    			{{td.isya}}
+		    		</td>
+		    	</tr>
+		    </table>
+
+		    <h4>Bulan Ini</h4>
+		    <table class="table table-hover">
+		    	<thead class="thead-light">
+		    	<tr>
+		    		<th>
+		    			Tanggal
+		    		</th>
+		    		<th>
+		    			Subuh
+		    		</th>
+		    		<th>
+		    			Terbit Matahari
+		    		</th>
+		    		<th>
+		    			Dhuhur
+		    		</th>
+		    		<th>
+		    			Ashar
+		    		</th>
+		    		<th>
+		    			Maghrib
+		    		</th>
+		    		<th>
+		    			Isya
+		    		</th>
+		    	</tr>
+		    	</thead>
+		    	<tr v-for="result in results">
+		    		<td>
+		    			{{result.date | formatDate}}
+		    		</td>
+		    		<td>
+		    			{{result.fajr}}
+		    		</td>
+		    		<td>
+		    			{{result.sunrise}}
+		    		</td>
+		    		<td>
+		    			{{result.zuhr}}
+		    		</td>
+		    		<td>
+		    			{{result.asr}}
+		    		</td>
+		    		<td>
+		    			{{result.maghrib}}
+		    		</td>
+		    		<td>
+		    			{{result.isya}}
+		    		</td>
+		    	</tr>
+		    </table>
+
+		   	<br>
+		   	<button v-on:click="show" class="btn btn-info">{{btnText}}</button>
+
+		    <template v-if="addCity">
+				<h1>Tambahkan Kota</h1>
+				<form class="form">
+					<div class="form-group">
+						<label for="kota">Nama Kota</label>
+						<input class="form-control" type="text" id="kota" v-model="city"/>
+					</div>
+					<div class="form-group">
+						<label for="lat">Latitude</label>
+						<input class="form-control" type="text" id="lat" v-model="lat"/>
+					</div>
+					<div class="form-group">
+						<label for="long">Longitude</label>
+						<input class="form-control" type="text" id="long" v-model="long"/>
+					</div>
+					<div class="form-group">
+						<label for="tz">Timezone</label>
+						<input class="form-control" type="text" id="tz" v-model="tz"/>
+					</div>
+					<button v-on:click="save" class="btn btn-success">Save</button>
+				</form>
+			</template>
+
+	    </div>
+
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    	<script src="https://unpkg.com/vue"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/id.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>

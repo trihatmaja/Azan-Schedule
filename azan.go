@@ -2,6 +2,7 @@ package azan
 
 import (
 	"errors"
+	"time"
 )
 
 // azan
@@ -20,13 +21,18 @@ func New(database DbProvider, cache CacheProvider, calculation CalcProvider) *Az
 }
 
 func (a *Azan) Generate(latitude, longitude, timezone float64, city string) error {
-	test, _ := a.db.GetByCity(city)
-	if test.City != "" {
-		return errors.New("city exist")
+
+	v, err := a.db.Validate(latitude, longitude, city)
+	if err != nil {
+		return err
+	}
+
+	if v {
+		return errors.New("city with latitude and longitude exists")
 	}
 	res := a.calc.Calculate(latitude, longitude, timezone, city)
 
-	err := a.db.Set(res)
+	err = a.db.Set(res)
 	if err != nil {
 		return err
 	}
@@ -41,8 +47,20 @@ func (a *Azan) GetByCity(city string) (CalcResult, error) {
 	return a.db.GetByCity(city)
 }
 
+func (a *Azan) GetByCityDate(city string, date time.Time) (CalcResult, error) {
+	return a.db.GetByCityDate(city, date)
+}
+
+func (a *Azan) GetByCityMonth(city string, month int) (CalcResult, error) {
+	return a.db.GetByCityMonth(city, month)
+}
+
 func (a *Azan) GetCache(key string) ([]byte, error) {
 	return a.cache.Get(key)
+}
+
+func (a *Azan) GetCities() ([]CalcResult, error) {
+	return a.db.GetCities()
 }
 
 func (a *Azan) SetCache(key string, data []byte) error {
