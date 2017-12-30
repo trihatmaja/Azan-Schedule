@@ -54,3 +54,15 @@ func (f *Files) GetByCity(city string) (azan.CalcResult, error) {
 func (f *Files) GetByDate(date time.Time) (azan.CalcResult, error) {
 	return azan.CalcResult{}, errors.New("Not Implemented Yet")
 }
+
+func (f *Files) GetByCityDate(city string, date time.Time) (azan.CalcResult, error) {
+	return azan.CalcResult{}, errors.New("Not Implemented Yet")
+}
+
+func (f *Files) GetByCityMonth(city string, month int) (azan.CalcResult, error) {
+	return azan.CalcResult{}, errors.New("Not Implemented Yet")
+}
+
+func (f *Files) GetCities() ([]azan.CalcResult, error) {
+	return []azan.CalcResult{}, errors.New("Not Implemented Yet")
+}

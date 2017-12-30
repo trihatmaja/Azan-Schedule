@@ -5,6 +5,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -21,8 +23,21 @@ import (
 	"github.com/trihatmaja/Azan-Schedule/handler"
 )
 
+var (
+	Version string
+	Build   string
+	AppPort string
+)
+
+func version(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	retString := fmt.Sprintf("{Version: %s, Build: %s}", Version, Build)
+	fmt.Fprintf(w, retString)
+}
+
 func main() {
-	gotenv.Load("../../.env")
+	gotenv.Load(".env")
+
+	AppPort = os.Getenv("APP_PORT")
 
 	dbOpt := database.OptionMySQL{
 		User:     os.Getenv("MYSQL_USER"),
@@ -56,9 +71,11 @@ func main() {
 	router.GET("/api/cities/:city", azHandler.ByCity)
 	router.GET("/api/cities/:city/date/:date", azHandler.ByCityDate)
 	router.GET("/api/cities/:city/month/:month", azHandler.ByCityMonth)
+	router.GET("/version.txt", version)
 	//router.GET("/api/", azHandler.All)
 
 	handler := cors.Default().Handler(router)
 
-	http.ListenAndServe(":1234", handler)
+	log.Println("application ready to receive request at port " + AppPort)
+	http.ListenAndServe(":"+AppPort, handler)
 }

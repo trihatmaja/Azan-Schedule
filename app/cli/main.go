@@ -5,6 +5,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	azan "github.com/trihatmaja/Azan-Schedule"
@@ -15,6 +16,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// apps var
 var (
 	latitude  float64
 	longitude float64
@@ -22,6 +24,12 @@ var (
 	city      string
 	outputdir string
 	filename  string
+)
+
+// main var
+var (
+	Version string
+	Build   string
 )
 
 func main() {
@@ -79,6 +87,14 @@ func main() {
 					Destination: &filename,
 					Value:       "schedule.json",
 				},
+			},
+		},
+		cli.Command{
+			Name:  "version",
+			Usage: "azan schedule version",
+			Action: func(c *cli.Context) error {
+				fmt.Printf("{Version: %s, Build: %s}", Version, Build)
+				return nil
 			},
 		},
 	}
