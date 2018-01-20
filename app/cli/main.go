@@ -7,7 +7,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -42,7 +44,38 @@ var (
 
 func checkSchedule() {
 	t := time.Now()
-	fmt.Println(t)
+	tgl := t.Format("2006-January-2")
+	jam := t.Format("15:04")
+
+	f, err := ioutil.ReadFile("schedule.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	k := azan.CalcResult{}
+
+	err = json.Unmarshal(f, &k)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for _, v := range k.Schedule {
+		if tgl == v.Date {
+			switch {
+			case jam == v.Fajr:
+				player.Play(mp3.FSMustByte(false, "/player/mp3/fajr.mp3"))
+			case jam == v.Zuhr:
+				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
+			case jam == v.Asr:
+				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
+			case jam == v.Maghrib:
+				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
+			case jam == v.Isya:
+				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
+			default:
+				break
+			}
+		}
+	}
 }
 
 func main() {

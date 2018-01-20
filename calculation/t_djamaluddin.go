@@ -146,10 +146,18 @@ func (az *TDjamaluddin) Calculate(latitude, longitude, timezone float64, city st
 				var buff string
 				th := int32(az.T[j])                        // hour
 				tm := int32((az.T[j] - float64(th)) * 60.0) // minute
-				if tm < 10 {
-					buff = fmt.Sprintf("%d:0%d", th, tm)
+				if th < 10 {
+					if tm < 10 {
+						buff = fmt.Sprintf("0%d:0%d", th, tm)
+					} else {
+						buff = fmt.Sprintf("0%d:%d", th, tm)
+					}
 				} else {
-					buff = fmt.Sprintf("%d:%d", th, tm)
+					if tm < 10 {
+						buff = fmt.Sprintf("%d:0%d", th, tm)
+					} else {
+						buff = fmt.Sprintf("%d:%d", th, tm)
+					}
 				}
 				switch j {
 				case 1:
