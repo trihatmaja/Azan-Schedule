@@ -1,3 +1,5 @@
+//go:generate esc -o ../../player/mp3/mp3.go -pkg mp3 ../../player/mp3
+
 /*
 	this is implementation azan in the form of cli
 */
@@ -7,12 +9,18 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	azan "github.com/trihatmaja/Azan-Schedule"
 
 	"github.com/trihatmaja/Azan-Schedule/calculation"
 	"github.com/trihatmaja/Azan-Schedule/database"
+	"github.com/trihatmaja/Azan-Schedule/player"
+	"github.com/trihatmaja/Azan-Schedule/player/mp3"
 
+	"github.com/jasonlvhit/gocron"
 	"github.com/urfave/cli"
 )
 
@@ -32,8 +40,14 @@ var (
 	Build   string
 )
 
+func checkSchedule() {
+	t := time.Now()
+	fmt.Println(t)
+}
+
 func main() {
 	app := cli.NewApp()
+	app.HideVersion = true
 	app.Name = "azan schedule"
 	app.Usage = "generate files for azan schedule each day in a year"
 	app.Commands = []cli.Command{
@@ -94,6 +108,47 @@ func main() {
 			Usage: "azan schedule version",
 			Action: func(c *cli.Context) error {
 				fmt.Printf("{Version: %s, Build: %s}", Version, Build)
+				return nil
+			},
+		},
+		cli.Command{
+			Name:  "play",
+			Usage: "play azan",
+			Action: func(c *cli.Context) error {
+				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
+				return nil
+			},
+		},
+		cli.Command{
+			Name:  "start",
+			Usage: "starting praying schedule",
+			Action: func(c *cli.Context) error {
+				fmt.Println("Starting schedule...")
+
+				var gracefulStop = make(chan os.Signal)
+				signal.Notify(gracefulStop, syscall.SIGTERM)
+				signal.Notify(gracefulStop, syscall.SIGINT)
+				go func() {
+					sig := <-gracefulStop
+					fmt.Println("\nCaught sig:", sig)
+					fmt.Println("Wait for apps to gracefully stop")
+					gocron.Remove(checkSchedule)
+					gocron.Clear()
+					os.Exit(0)
+				}()
+
+				fmt.Println("Check file schedule.json...")
+
+				if _, err := os.Stat("schedule.json"); os.IsNotExist(err) {
+					fmt.Println("Cannot find file schedule.json, please run generate first!")
+					return nil
+				}
+
+				fmt.Println("Ok!")
+				fmt.Println("Running job..")
+
+				gocron.Every(1).Minute().Do(checkSchedule)
+				<-gocron.Start()
 				return nil
 			},
 		},

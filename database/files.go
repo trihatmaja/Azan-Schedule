@@ -40,7 +40,7 @@ func (f *Files) Set(data azan.CalcResult) error {
 }
 
 func (f *Files) Validate(lat, long float64, city string) (bool, error) {
-	return true, nil
+	return false, nil
 }
 
 func (f *Files) GetAll() ([]azan.CalcResult, error) {

@@ -21,7 +21,6 @@ func New(database DbProvider, cache CacheProvider, calculation CalcProvider) *Az
 }
 
 func (a *Azan) Generate(latitude, longitude, timezone float64, city string) error {
-
 	v, err := a.db.Validate(latitude, longitude, city)
 	if err != nil {
 		return err
