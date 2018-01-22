@@ -42,34 +42,28 @@ var (
 	Build   string
 )
 
-func checkSchedule() {
+func checkSchedule(k *azan.CalcResult) {
 	t := time.Now()
 	tgl := t.Format("2006-January-2")
 	jam := t.Format("15:04")
-
-	f, err := ioutil.ReadFile("schedule.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	k := azan.CalcResult{}
-
-	err = json.Unmarshal(f, &k)
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	for _, v := range k.Schedule {
 		if tgl == v.Date {
 			switch {
 			case jam == v.Fajr:
+				fmt.Println("Fajr Pray Time")
 				player.Play(mp3.FSMustByte(false, "/player/mp3/fajr.mp3"))
 			case jam == v.Zuhr:
+				fmt.Println("Zuhr Pray Time")
 				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
 			case jam == v.Asr:
+				fmt.Println("Asr Pray Time")
 				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
 			case jam == v.Maghrib:
+				fmt.Println("Maghrib Pray Time")
 				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
 			case jam == v.Isya:
+				fmt.Println("Isya' Pray Time")
 				player.Play(mp3.FSMustByte(false, "/player/mp3/azan.mp3"))
 			default:
 				break
@@ -158,17 +152,20 @@ func main() {
 			Action: func(c *cli.Context) error {
 				fmt.Println("Starting schedule...")
 
+				//gocron.Every(1).Minute().Do(checkSchedule, &k)
+				s := gocron.NewScheduler()
+
 				var gracefulStop = make(chan os.Signal)
 				signal.Notify(gracefulStop, syscall.SIGTERM)
 				signal.Notify(gracefulStop, syscall.SIGINT)
-				go func() {
+				go func(s *gocron.Scheduler) {
 					sig := <-gracefulStop
 					fmt.Println("\nCaught sig:", sig)
 					fmt.Println("Wait for apps to gracefully stop")
-					gocron.Remove(checkSchedule)
-					gocron.Clear()
+					s.Remove(checkSchedule)
+					s.Clear()
 					os.Exit(0)
-				}()
+				}(s)
 
 				fmt.Println("Check file schedule.json...")
 
@@ -178,10 +175,21 @@ func main() {
 				}
 
 				fmt.Println("Ok!")
-				fmt.Println("Running job..")
 
-				gocron.Every(1).Minute().Do(checkSchedule)
-				<-gocron.Start()
+				f, err := ioutil.ReadFile("schedule.json")
+				if err != nil {
+					fmt.Println(err)
+				}
+				k := azan.CalcResult{}
+
+				err = json.Unmarshal(f, &k)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				fmt.Println("Running job..")
+				s.Every(1).Minute().Do(checkSchedule, &k)
+				<-s.Start()
 				return nil
 			},
 		},
