@@ -13,7 +13,10 @@ This application to generate Azan Schedule or Sholat Schedule based on position(
 If you want to generate files that set the azan schedule, build the cli
 
 1. Build the application using `make cli`
-2. Run `./azan_cli --latitude=-6.18 --longitude=106.83 --timezone=+7 --city=jakarta`
+2. Run `./azan_cli generate --latitude=-6.18 --longitude=106.83 --timezone=+7 --city=jakarta` for generating schedule in json format
+3. Run `./azan_cli play` to play azan manually
+4. Run `./azan_cli start` to play azan automatically as scheduled
+
 
 ### Build API Server
 
