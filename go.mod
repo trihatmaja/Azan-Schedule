@@ -1,6 +1,6 @@
 module github.com/trihatmaja/Azan-Schedule
 
-go 1.22.2
+go 1.24.2
 
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20250403215159-8d39553ac7cf
