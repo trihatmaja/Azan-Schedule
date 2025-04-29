@@ -1,7 +1,7 @@
-FROM golang:1.9-stretch AS builder
+FROM golang:1.24.2-alpine AS builder
 WORKDIR /go/src/github.com/trihatmaja/Azan-Schedule
 COPY ../../* .
-RUN CGO_ENABLED=0 make api
+RUN make api
 
 FROM alpine:latest
 WORKDIR /app
