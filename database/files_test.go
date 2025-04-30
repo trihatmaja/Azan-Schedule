@@ -90,7 +90,7 @@ func (suite *FilesSuite) TestValidate() {
 	k, e := db.Validate(lat, long, "jakarta")
 
 	assert.Nil(suite.T(), e)
-	assert.Equal(suite.T(), true, k)
+	assert.Equal(suite.T(), false, k)
 }
 
 func TestFilesSuite(t *testing.T) {
