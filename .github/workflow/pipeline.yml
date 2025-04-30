@@ -3,14 +3,14 @@ name: Build and Deploy to Kubernetes
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     env:
-      REGISTRY: ghcr.io  # atau docker.io kalau pakai DockerHub
+      REGISTRY: docker.io  # atau docker.io kalau pakai DockerHub
       IMAGE_NAME: ${{ github.repository }} # ex: username/repo
       K8S_NAMESPACE: azan-schedule
 
