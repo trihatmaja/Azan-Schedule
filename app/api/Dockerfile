@@ -3,7 +3,8 @@ WORKDIR /go/src/github.com/trihatmaja/Azan-Schedule
 COPY ./* .
 RUN apk update && \
     apk add make && \
-    make api
+    make api && \
+    ls
 
 FROM alpine:latest
 WORKDIR /app
