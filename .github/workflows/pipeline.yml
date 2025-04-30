@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Run Unit Test
-      run: go test ./...
+      run: go test -v ./...
 
   sast-scan:
     runs-on: ubuntu-latest
@@ -25,9 +25,10 @@ jobs:
     - name: Checkout source code
       uses: actions/checkout@v4
 
-    - uses: AppThreat/sast-scan-action@master
+    - name: Run Gosec Security Scanner
+      uses: securego/gosec@master
       with:
-        type: "go"
+        args: ./...
 
   build-docker:
     runs-on: ubuntu-latest
