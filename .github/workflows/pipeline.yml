@@ -35,8 +35,8 @@ jobs:
         file: Dockerfile
         push: false
         tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.IMAGE_NAME }}:latest
+          ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
   # kubernetes-deployment:
     # runs-on: ubuntu-latest
