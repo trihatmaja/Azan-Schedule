@@ -3,7 +3,7 @@ WORKDIR /go/src/github.com/trihatmaja/Azan-Schedule
 COPY ./* .
 RUN pwd && \
     ls && \
-    go build -o azan_api ./app/api/main.go && \
+    go build -o azan_api ./api/main.go && \
     ls
 
 FROM alpine:latest
