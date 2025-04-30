@@ -50,8 +50,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.28.0
       with:
         image-ref: '${{ env.IMAGE_NAME }}:${{ github.sha }}'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        format: 'table'
         severity: "HIGH,CRITICAL"
         vuln-type: 'os,library'
 
