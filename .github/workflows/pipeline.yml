@@ -55,7 +55,7 @@ jobs:
 
   build-scan-push-image:
     runs-on: ubuntu-latest
-    needs: sast-scan
+    needs: [sast-scan, vuln-scan]
 
     env:
       REGISTRY: docker.io
