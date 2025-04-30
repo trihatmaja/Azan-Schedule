@@ -32,7 +32,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: app/api/
-        file: Dockerfile
+        file: app/api/Dockerfile
         push: false
         tags: |
           ${{ env.IMAGE_NAME }}:latest
