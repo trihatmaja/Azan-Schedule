@@ -1,7 +1,9 @@
 FROM golang:1.24.2-alpine AS builder
 WORKDIR /go/src/github.com/trihatmaja/Azan-Schedule
 COPY ./* .
-RUN go mod tidy && \
+RUN apk update && \
+    apk add git && \
+    go mod tidy && \
     go build -o azan_api ./api/main.go
 
 FROM alpine:latest
