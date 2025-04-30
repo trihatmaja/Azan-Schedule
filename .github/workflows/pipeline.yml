@@ -31,7 +31,7 @@ jobs:
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: app/api/
+        context: .
         file: app/api/Dockerfile
         push: false
         tags: |
