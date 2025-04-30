@@ -5,7 +5,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,11 +27,6 @@ var (
 	Build   string
 	AppPort string
 )
-
-func version(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	retString := fmt.Sprintf("{Version: %s, Build: %s}", Version, Build)
-	fmt.Fprintf(w, retString)
-}
 
 func main() {
 	gotenv.Load(".env")
@@ -71,7 +65,6 @@ func main() {
 	router.GET("/api/cities/:city", azHandler.ByCity)
 	router.GET("/api/cities/:city/date/:date", azHandler.ByCityDate)
 	router.GET("/api/cities/:city/month/:month", azHandler.ByCityMonth)
-	router.GET("/version.txt", version)
 	//router.GET("/api/", azHandler.All)
 
 	handler := cors.Default().Handler(router)
