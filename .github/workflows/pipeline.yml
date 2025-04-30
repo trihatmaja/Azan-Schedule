@@ -6,6 +6,28 @@ on:
       - master
 
 jobs:
+
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Run Unit Test
+      run: go test ./...
+
+  sast-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - uses: AppThreat/sast-scan-action@master
+      with:
+        type: "go"
+
   build-docker:
     runs-on: ubuntu-latest
 
