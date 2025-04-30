@@ -1,7 +1,8 @@
 FROM golang:1.24.2-alpine AS builder
 WORKDIR /go/src/github.com/trihatmaja/Azan-Schedule
 COPY ../../* .
-RUN ls && make api
+RUN pwd
+RUN ls /go/src/github.com/trihatmaja/Azan-Schedule
 
 FROM alpine:latest
 WORKDIR /app
