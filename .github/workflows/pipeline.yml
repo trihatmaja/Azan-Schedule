@@ -58,7 +58,7 @@ jobs:
       with:
         context: ../.
         file: app/api/Dockerfile
-        push: false
+        push: true
         tags: |
           ${{ env.IMAGE_NAME }}:latest
           ${{ env.IMAGE_NAME }}:${{ github.sha }}
