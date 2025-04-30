@@ -33,26 +33,26 @@ jobs:
       with:
         context: app/api/
         file: Dockerfile
-        push: true
+        push: false
         tags: |
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
+    # - name: Set up kubectl
+    #   uses: azure/setup-kubectl@v3
+    #   with:
+    #     version: 'latest'
 
-    - name: Set up Kubeconfig
-      run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBECONFIG_CONTENT }}" > ~/.kube/config
-        chmod 600 ~/.kube/config
+    # - name: Set up Kubeconfig
+    #   run: |
+    #     mkdir -p ~/.kube
+    #     echo "${{ secrets.KUBECONFIG_CONTENT }}" > ~/.kube/config
+    #     chmod 600 ~/.kube/config
 
-    - name: Update image in deployment.yaml
-      run: |
-        sed -i "s|image:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|" k8s/deployment.yaml
+    # - name: Update image in deployment.yaml
+    #   run: |
+    #     sed -i "s|image:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}|" k8s/deployment.yaml
 
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f k8s/
+    # - name: Deploy to Kubernetes
+    #   run: |
+    #     kubectl apply -f k8s/
