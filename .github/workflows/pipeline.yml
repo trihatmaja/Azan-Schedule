@@ -6,12 +6,12 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  build-docker:
     runs-on: ubuntu-latest
 
     env:
-      REGISTRY: docker.io  # atau docker.io kalau pakai DockerHub
-      IMAGE_NAME: ${{ github.repository }} # ex: username/repo
+      REGISTRY: docker.io
+      IMAGE_NAME: ${{ github.repository }}
       K8S_NAMESPACE: azan-schedule
 
     steps:
@@ -38,6 +38,8 @@ jobs:
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
+  # kubernetes-deployment:
+    # runs-on: ubuntu-latest
     # - name: Set up kubectl
     #   uses: azure/setup-kubectl@v3
     #   with:
