@@ -58,10 +58,24 @@ jobs:
       with:
         context: ../.
         file: app/api/Dockerfile
-        push: true
+        push: false
         tags: |
           ${{ env.IMAGE_NAME }}:latest
           ${{ env.IMAGE_NAME }}:${{ github.sha }}
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        image-ref: '${{ env.IMAGE_NAME }}:${{ github.sha }}'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: "HIGH,CRITICAL"
+        vuln-type: 'os,library'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
 
   # kubernetes-deployment:
     # runs-on: ubuntu-latest
